@@ -22,5 +22,8 @@ jar {
 
 run {
     standardInput = System.in
+    if(project.hasProperty('appArgs')){
+        args(appArgs.split('\\s+'))
+    }
 }
 

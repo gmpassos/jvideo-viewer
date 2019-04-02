@@ -1,9 +1,30 @@
 JVideo Viewer
 =============================
 
-The project...
+A simple Java Viewer of V4L2 (Video for Linux 2) streaming.
 
 ## USAGE:
+
+Clone the project
+
+```
+
+$> git clone https://github.com/gmpassos/jvideo-viewer.git
+$> cd jvideo-viewer
+
+```
+
+Run using gradle:
+
+
+```
+
+$> ./gradlew run -PappArgs="8060 mjpeg"
+
+```
+
+
+## Java Command line:
 
 Run viewer at port 8060:
 
@@ -16,6 +37,8 @@ $> java org.gracilianomp.jvideoviewer.JVideoViewer 8060 mjpeg
 $> java org.gracilianomp.jvideoviewer.JVideoViewer 8060 yuyv 640 480
 
 ```
+
+## V4L2 Command:
 
 Run capture streaming to IP 192.168.0.57 at port 8060:
 
