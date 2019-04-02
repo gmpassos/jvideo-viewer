@@ -1,0 +1,26 @@
+apply from: 'gradle/single-project-java8.gradle'
+apply from: 'gradle/logback.gradle'
+apply plugin: 'application'
+
+mainClassName = "org.gracilianomp.jvideoviewer.JVideoViewer"
+applicationDefaultJvmArgs = ["-server", "-Xms2000m", "-Xmx10000m", "-XX:+UseG1GC", "-XX:MaxGCPauseMillis=5000", "-XX:-UseGCOverheadLimit", "-XX:+UseCompressedOops", "-XX:CompileThreshold=500", "-XX:+AggressiveOpts", "-XX:+UseFastAccessorMethods"]
+
+dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: slf4jVersion
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
+
+    testCompile group: 'junit', name: 'junit', version: junitVersion
+}
+
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': 'Jvideo Viewer'
+        )
+    }
+}
+
+run {
+    standardInput = System.in
+}
+
