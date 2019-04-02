@@ -14,15 +14,18 @@ $> cd jvideo-viewer
 
 ```
 
-Run using gradle:
+Run viewer at port 8060 using Gradle:
 
 
 ```
 
 $> ./gradlew run -PappArgs="8060 mjpeg"
 
-```
+## or
 
+$> ./gradlew run -PappArgs="8060 yuyv 640 480"
+
+```
 
 ## Java Command line:
 
