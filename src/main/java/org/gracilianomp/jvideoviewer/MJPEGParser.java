@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -14,49 +13,31 @@ public class MJPEGParser extends ImageParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MJPEGParser.class);
 
-    public MJPEGParser(InputStream in) {
+    public MJPEGParser(InputStream in) throws IOException {
         super(in);
     }
 
-    private ByteArrayOutputStream jpgOut = new ByteArrayOutputStream(8192);
+    int imageCount = 0 ;
 
-    int prev ;
-
-    @Override
     public BufferedImage parseImage() throws IOException {
+        FrameHeader frameHeader = parseFrameHeader();
 
-        while ( !isClosed() ) {
-            int cur = in.read();
+        byte[] frameBytes = readFramePlaneData(frameHeader.planes[0]);
+        if (frameBytes == null) return null;
 
-            if (cur < 0) {
-                close();
-                return null ;
-            }
+        imageCount++ ;
 
-            if (prev == 0xFF && cur == 0xD8) {
-                jpgOut.reset();
-                jpgOut.write(prev);
-            }
+        try {
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(frameBytes));
 
-            jpgOut.write(cur);
+            LOGGER.info("Read JPEG Image> frameBytes: {}, imageCount: {}", frameBytes.length, imageCount);
 
-            if (prev == 0xFF && cur == 0xD9) {
-                byte[] frameBytes = jpgOut.toByteArray();
-                jpgOut.reset();
-
-                try {
-                    BufferedImage image = ImageIO.read(new ByteArrayInputStream(frameBytes));
-                    return image;
-                }
-                catch (IOException e) {
-                    //LOGGER.error("Can't decode frame", e);
-                }
-            }
-
-            prev = cur;
+            return image;
+        }
+        catch (IOException e) {
+            return null ;
         }
 
-        return null ;
     }
 
 }

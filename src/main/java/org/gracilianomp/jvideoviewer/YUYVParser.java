@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.zip.GZIPInputStream;
 
 public class YUYVParser extends ImageParser {
 
@@ -28,36 +27,24 @@ public class YUYVParser extends ImageParser {
     @Override
     public BufferedImage parseImage() throws IOException {
 
+        FrameHeader frameHeader = parseFrameHeader();
+
+        byte[] data = readFramePlaneData(frameHeader.planes[0]);
+        if (data == null) return null;
+
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        ////////////
 
         int y = 0 ;
         int x = 0 ;
 
-        byte[] buff = new byte[4] ;
 
-        int imageSize = 0 ;
-
-        while ( !isClosed() ) {
-
-            int read = 0 ;
-
-            while (read < 4) {
-                int r = in.read(buff, read, 4-read) ;
-
-                if (r < 0) {
-                    close();
-                    return null ;
-                }
-
-                read += r ;
-            }
-
-            imageSize += 4 ;
-
-            int y1 = buff[0] & 0xFF ;
-            int u = buff[1] & 0xFF ;
-            int y2 = buff[2] & 0xFF ;
-            int v = buff[3] & 0xFF ;
+        for (int i = 0; i < data.length; i+= 4) {
+            int y1 = data[i] & 0xFF ;
+            int u = data[i+1] & 0xFF ;
+            int y2 = data[i+2] & 0xFF ;
+            int v = data[i+3] & 0xFF ;
 
             float y1F = y1 / 255f;
             float y2F = y2 / 255f;
@@ -70,9 +57,7 @@ public class YUYVParser extends ImageParser {
 
             x++ ;
             if (x == width) {
-                x = 0 ;
-                y++ ;
-                if (y == height) return img ;
+                throw new IllegalStateException() ;
             }
 
             int rgb2 = YUVtoRGB(y2F, uF, vF);
@@ -83,14 +68,16 @@ public class YUYVParser extends ImageParser {
                 x = 0 ;
                 y++ ;
                 if (y == height) {
-                    return img ;
+                    break;
                 }
             }
 
+
         }
 
-        return null ;
+        return img ;
     }
+
 
     public static int YUVtoRGB(float y, float u, float v){
         int r = (int)((y + 0.000f * u + 1.140f * v) * 255f);

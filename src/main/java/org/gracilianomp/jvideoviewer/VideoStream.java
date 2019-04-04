@@ -44,7 +44,9 @@ public class VideoStream implements Runnable {
         while ( !imageParser.isClosed() ) {
             BufferedImage image = imageParser.parseImage() ;
 
-            imageListener.onReadImage(image);
+            if (image != null) {
+                imageListener.onReadImage(image);
+            }
         }
 
         imageParser.close();

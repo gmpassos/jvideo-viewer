@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,7 +33,10 @@ public class JVideoViewer {
     }
 
     public void testFormat(ImageFormat imageFormat, String[] formatParameters) throws IOException {
-        imageFormat.createParser(new ByteArrayInputStream(new byte[0]), formatParameters);
+        try {
+            imageFormat.createParser(new ByteArrayInputStream(new byte[0]), formatParameters);
+        }
+        catch (EOFException ignore) { }
     }
 
     private ServerSocket server;
